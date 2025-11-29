@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Treino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            color: #1a1a1a;
+            font-size: 1.6em;
+            margin-bottom: 0;
+        }
+
+        .days-container {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .day-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 2px solid #4a4a4a;
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            cursor: pointer;
+            user-select: none;
+            background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+            color: white;
+            transition: background 0.3s;
+        }
+
+        .day-header:hover {
+            background: linear-gradient(135deg, #4a4a4a 0%, #3a3a3a 100%);
+        }
+
+        .day-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-icon {
+            font-size: 0.9em;
+            transition: transform 0.3s;
+        }
+
+        .toggle-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .day-name {
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .day-type {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        .day-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .day-content.expanded {
+            max-height: 5000px;
+            transition: max-height 0.6s ease-in;
+        }
+
+        .day-content-inner {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-top: 16px;
+            margin-bottom: 12px;
+            padding-left: 12px;
+            border-left: 4px solid #4a4a4a;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .exercises-list {
+            list-style: none;
+        }
+
+        .exercise-item {
+            background: #f5f5f5;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #4a4a4a;
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #4a4a4a;
+            flex-shrink: 0;
+        }
+
+        .exercise-info {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-name {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .muscle-tag {
+            background: #4a4a4a;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.65em;
+            font-weight: 600;
+        }
+
+        .sets-info {
+            color: #666666;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .weight-input-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .weight-label {
+            font-size: 0.8em;
+            color: #666666;
+            font-weight: 500;
+        }
+
+        .weight-input {
+            width: 70px;
+            padding: 5px 8px;
+            border: 2px solid #cccccc;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #1a1a1a;
+            transition: border-color 0.3s;
+        }
+
+        .weight-input:focus {
+            outline: none;
+            border-color: #4a4a4a;
+        }
+
+        .exercise-item.completed {
+            background: #e8f5e6;
+            border-left-color: #4caf50;
+        }
+
+        .exercise-item.completed .muscle-tag {
+            background: #4caf50;
+        }
+
+        .progress-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 2px solid #4a4a4a;
+        }
+
+        .progress-title {
+            color: #1a1a1a;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-container {
+            background: #e0e0e0;
+            border-radius: 20px;
+            height: 26px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #4a4a4a, #2a2a2a);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(74, 74, 74, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .day-name {
+                font-size: 0.9em;
+            }
+
+            .day-type {
+                font-size: 0.65em;
+                padding: 3px 10px;
+            }
+
+            .exercise-name {
+                font-size: 0.9em;
+            }
+
+            .exercise-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .weight-input-container {
+                margin-left: 30px;
+            }
+
+            .progress-title {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Ficha de Treino</h1>
+        </header>
+
+        <div class="days-container">
+            <!-- TREINO A -->
+            <div class="day-card">
+                <div class="day-header" onclick="toggleDay(this)">
+                    <div class="day-header-left">
+                        <span class="toggle-icon">▶</span>
+                        <span class="day-name">TREINO A - FOCO PUSH</span>
+                    </div>
+                    <span class="day-type">10 EXERCÍCIOS</span>
+                </div>
+                <div class="day-content">
+                    <div class="day-content-inner">
+                        <div class="section-title">1. Ativação Pull</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Pulldown Pegada Aberta</span>
+                                        <span class="muscle-tag">dorsal</span>
+                                        <span class="sets-info">3x10-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Rosca Direta Barra</span>
+                                        <span class="muscle-tag">bíceps</span>
+                                        <span class="sets-info">3x8-10</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">2. Push Principal</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Supino Inclinado 45º</span>
+                                        <span class="muscle-tag">peitoral</span>
+                                        <span class="sets-info">4x6-8</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Desenvolvimento Haltere</span>
+                                        <span class="muscle-tag">ombro</span>
+                                        <span class="sets-info">3x8-10</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Paralelas/Dips</span>
+                                        <span class="muscle-tag">peitoral</span>
+                                        <span class="muscle-tag">tríceps</span>
+                                        <span class="sets-info">3x8-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso adicional:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">3. Pernas - Anterior</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Agachamento Livre</span>
+                                        <span class="muscle-tag">quadríceps</span>
+                                        <span class="muscle-tag">glúteo</span>
+                                        <span class="sets-info">4x6-8</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Banco Extensor</span>
+                                        <span class="muscle-tag">quadríceps</span>
+                                        <span class="sets-info">3x12-15</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Mesa Flexora</span>
+                                        <span class="muscle-tag">posterior</span>
+                                        <span class="sets-info">3x10-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Panturrilha em Pé</span>
+                                        <span class="muscle-tag">panturrilha</span>
+                                        <span class="sets-info">4x12-15</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="5">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">4. Finalização</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Tríceps Corda</span>
+                                        <span class="muscle-tag">tríceps</span>
+                                        <span class="sets-info">3x12-15</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TREINO B -->
+            <div class="day-card">
+                <div class="day-header" onclick="toggleDay(this)">
+                    <div class="day-header-left">
+                        <span class="toggle-icon">▶</span>
+                        <span class="day-name">TREINO B - FOCO PULL</span>
+                    </div>
+                    <span class="day-type">10 EXERCÍCIOS</span>
+                </div>
+                <div class="day-content">
+                    <div class="day-content-inner">
+                        <div class="section-title">1. Ativação Push</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Cross Over</span>
+                                        <span class="muscle-tag">peitoral</span>
+                                        <span class="sets-info">3x12-15</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Tríceps Francês</span>
+                                        <span class="muscle-tag">tríceps</span>
+                                        <span class="sets-info">3x10-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">2. Pull Principal</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Barra Fixa</span>
+                                        <span class="muscle-tag">dorsal</span>
+                                        <span class="muscle-tag">bíceps</span>
+                                        <span class="sets-info">4x6-10</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso adicional:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Remada Serrote</span>
+                                        <span class="muscle-tag">costas</span>
+                                        <span class="sets-info">3x8-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Rosca Banco 45º</span>
+                                        <span class="muscle-tag">bíceps</span>
+                                        <span class="sets-info">3x10-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">3. Pernas - Glúteo</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Leg Press 45º</span>
+                                        <span class="muscle-tag">quadríceps</span>
+                                        <span class="muscle-tag">glúteo</span>
+                                        <span class="sets-info">4x10-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="10">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Agachamento Sumô</span>
+                                        <span class="muscle-tag">glúteo</span>
+                                        <span class="muscle-tag">adutor</span>
+                                        <span class="sets-info">3x10-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Adutora Máquina</span>
+                                        <span class="muscle-tag">adutor</span>
+                                        <span class="sets-info">3x12-15</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Panturrilha Sentado</span>
+                                        <span class="muscle-tag">panturrilha</span>
+                                        <span class="sets-info">3x15-20</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="5">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">4. Finalização</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Elevação Lateral</span>
+                                        <span class="muscle-tag">ombro</span>
+                                        <span class="sets-info">3x12-15</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="1">
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TREINO C -->
+            <div class="day-card">
+                <div class="day-header" onclick="toggleDay(this)">
+                    <div class="day-header-left">
+                        <span class="toggle-icon">▶</span>
+                        <span class="day-name">TREINO C - PERNAS COMPLETO</span>
+                    </div>
+                    <span class="day-type">10 EXERCÍCIOS</span>
+                </div>
+                <div class="day-content">
+                    <div class="day-content-inner">
+                        <div class="section-title">1. Posterior Prioritário</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Stiff / Levantamento Terra</span>
+                                        <span class="muscle-tag">posterior</span>
+                                        <span class="muscle-tag">lombar</span>
+                                        <span class="muscle-tag">glúteo</span>
+                                        <span class="sets-info">4x8-10</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Mesa Flexora</span>
+                                        <span class="muscle-tag">posterior</span>
+                                        <span class="sets-info">4x10-12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Elevação Pélvica / Glute Bridge</span>
+                                        <span class="muscle-tag">glúteo</span>
+                                        <span class="muscle-tag">posterior</span>
+                                        <span class="sets-info">3x12-15</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="5">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">2. Anterior</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Afundo / Walking Lunge</span>
+                                        <span class="muscle-tag">quadríceps</span>
+                                        <span class="muscle-tag">glúteo</span>
+                                        <span class="sets-info">3x10 cada</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Leg Press 45º</span>
+                                        <span class="muscle-tag">quadríceps</span>
+                                        <span class="muscle-tag">glúteo</span>
+                                        <span class="sets-info">3x12-15</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="10">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">3. Acessórios</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Banco Extensor</span>
+                                        <span class="muscle-tag">quadríceps</span>
+                                        <span class="sets-info">3x15-20</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Panturrilha em Pé</span>
+                                        <span class="muscle-tag">panturrilha</span>
+                                        <span class="sets-info">4x15-20</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="5">
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="section-title">4. Superior Leve</div>
+                        <ul class="exercises-list">
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Pulldown</span>
+                                        <span class="muscle-tag">dorsal</span>
+                                        <span class="sets-info">3x12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Supino Máquina / Cross</span>
+                                        <span class="muscle-tag">peitoral</span>
+                                        <span class="sets-info">3x12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                            <li class="exercise-item">
+                                <div class="exercise-header">
+                                    <input type="checkbox" class="checkbox">
+                                    <div class="exercise-info">
+                                        <span class="exercise-name">Desenvolvimento Máquina</span>
+                                        <span class="muscle-tag">ombro</span>
+                                        <span class="sets-info">2x12</span>
+                                    </div>
+                                </div>
+                                <div class="weight-input-container">
+                                    <span class="weight-label">Peso:</span>
+                                    <input type="number" class="weight-input" placeholder="kg" min="0" step="2.5">
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progresso -->
+        <div class="progress-section">
+            <h2 class="progress-title">Progresso Semanal</h2>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <p style="color: #7f8c8d; margin-top: 8px; font-size: 0.95em;">
+                <span id="completedCount">0</span> de <span id="totalCount">0</span> exercícios completos
+            </p>
+            <div class="buttons-container">
+                <button class="btn" onclick="saveWeights()">Salvar Pesos</button>
+                <button class="btn btn-danger" onclick="resetProgress()">Resetar Semana</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDay(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            content.classList.toggle('expanded');
+            icon.classList.toggle('expanded');
+            const dayName = header.querySelector('.day-name').textContent;
+            localStorage.setItem(`day-${dayName}`, content.classList.contains('expanded'));
+        }
+
+        function loadExpandedStates() {
+            document.querySelectorAll('.day-header').forEach(header => {
+                const dayName = header.querySelector('.day-name').textContent;
+                if (localStorage.getItem(`day-${dayName}`) === 'true') {
+                    header.nextElementSibling.classList.add('expanded');
+                    header.querySelector('.toggle-icon').classList.add('expanded');
+                }
+            });
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('workoutProgress');
+            if (saved) {
+                JSON.parse(saved).forEach((checked, i) => {
+                    const cb = document.querySelectorAll('.checkbox')[i];
+                    if (cb && checked) {
+                        cb.checked = true;
+                        cb.closest('.exercise-item').classList.add('completed');
+                    }
+                });
+            }
+            updateProgress();
+        }
+
+        function saveProgress() {
+            localStorage.setItem('workoutProgress', JSON.stringify(
+                Array.from(document.querySelectorAll('.checkbox')).map(cb => cb.checked)
+            ));
+        }
+
+        function loadWeights() {
+            const saved = localStorage.getItem('exerciseWeights');
+            if (saved) {
+                JSON.parse(saved).forEach((w, i) => {
+                    const input = document.querySelectorAll('.weight-input')[i];
+                    if (input && w) input.value = w;
+                });
+            }
+        }
+
+        function saveWeights() {
+            localStorage.setItem('exerciseWeights', JSON.stringify(
+                Array.from(document.querySelectorAll('.weight-input')).map(i => i.value)
+            ));
+            const btn = event.target;
+            const orig = btn.textContent;
+            btn.textContent = 'Salvo!';
+            btn.style.background = 'linear-gradient(135deg, #4caf50, #388e3c)';
+            setTimeout(() => {
+                btn.textContent = orig;
+                btn.style.background = '';
+            }, 2000);
+        }
+
+        function updateProgress() {
+            const cbs = document.querySelectorAll('.checkbox');
+            const done = Array.from(cbs).filter(cb => cb.checked).length;
+            const pct = Math.round((done / cbs.length) * 100);
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressBar').textContent = pct + '%';
+            document.getElementById('completedCount').textContent = done;
+            document.getElementById('totalCount').textContent = cbs.length;
+        }
+
+        function resetProgress() {
+            if (confirm('Resetar progresso? Os pesos NÃO serão apagados.')) {
+                localStorage.removeItem('workoutProgress');
+                document.querySelectorAll('.checkbox').forEach(cb => {
+                    cb.checked = false;
+                    cb.closest('.exercise-item').classList.remove('completed');
+                });
+                updateProgress();
+            }
+        }
+
+        document.querySelectorAll('.checkbox').forEach(cb => {
+            cb.addEventListener('change', function() {
+                this.closest('.exercise-item').classList.toggle('completed', this.checked);
+                saveProgress();
+                updateProgress();
+            });
+        });
+
+        document.querySelectorAll('.weight-input').forEach(input => {
+            input.addEventListener('change', () => {
+                localStorage.setItem('exerciseWeights', JSON.stringify(
+                    Array.from(document.querySelectorAll('.weight-input')).map(i => i.value)
+                ));
+            });
+        });
+
+        loadExpandedStates();
+        loadProgress();
+        loadWeights();
+    </script>
+</body>
+</html>
